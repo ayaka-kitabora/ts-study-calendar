@@ -3,37 +3,69 @@ import React, {Component} from 'react'
 import Calendar from 'react-calendar'
 
 interface kame {
-  date: string,
-  taiju: number,
+  taiju: number | null,
   nomigusuri: boolean,
-  medusuri: boolean,
-  esa: number,
+  megusuri: boolean,
+  esa: number | null,
 }
 
 class Home extends React.Component {
   state = {
     date: new Date() as Date,
-    kame: [{
-      date: '20200618',
+    kame: {
+      '20200618': {
       taiju: 310,
       nomigusuri: true,
-      medusuri: true,
+      megusuri: true,
       esa: 100,
-    }] as kame[],
-  }
-  // 書き方あってないっぽいけどこういうことがやりたい
-  currentKameData = this.state.kame.find((data: kame) => {
-    const date: Date = new Date(this.state.date) 
-    const dateFormat: string = `${date.getFullYear()}${date.getMonth() + 1}${date.getDate()}`
-    if (data.date === dateFormat) {
-      return true
+    }} as {[key: string]: kame},
+    currentKame: {
+      date: null,
+      taiju: null,
+      nomigusuri: false,
+      megusuri: false,
+      esa: null,
     }
-  })
+  }
   onChange = (date: Date) => {
-    this.setState({ date })
+    const formatDate = new Date (date)
+    this.setState({ date: formatDate })
+    if (this.currentKameData) {
+      this.setState({currentKame: this.currentKameData})
+    } else {
+      this.setState({currentKame: this.kameTemplate})
+    }
   }
 
+  kameTemplate = {
+    taiju: null,
+    nomigusuri: false,
+    megusuri: false,
+    esa: null,
+  }
+
+  handleChangeKameTaiju = (event) => {
+    console.log(event.target.value)
+    let kame = this.state.kame
+    console.log(this.currentKameData)
+    if (this.currentKameData) {
+      kame[this.dateFormat].taiju = event.target.value
+    } else {
+      let kameTemplate = this.kameTemplate
+      kameTemplate.taiju = event.target.value
+      kame[this.dateFormat] = kameTemplate
+    }
+    console.log(kame)
+    this.setState({kame: kame})
+    console.log(this.state.kame)
+  }
+
+  date: Date = new Date(this.state.date) 
+  dateFormat: string = `${this.date.getFullYear()}${this.date.getMonth() + 1}${this.date.getDate()}`
+  currentKameData = this.state.kame[this.dateFormat] || null
+
   render() {
+
     return (
       <div className="container">
         <Head>
@@ -58,7 +90,7 @@ class Home extends React.Component {
                   <div className="form-row">
                     <label>
                       <span className="input-label">体重</span>
-                        <input className="input-number" type="number" value={this.currentKameData ? this.currentKameData.taiju : ''}></input>
+                        <input className="input-number" type="number" value={this.state.currentKame.taiju }  onChange={this.handleChangeKameTaiju}></input>
                       <span className="input-unit">g</span>
                     </label>
                   </div>
