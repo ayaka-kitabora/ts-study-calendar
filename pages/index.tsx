@@ -32,32 +32,35 @@ const App: FC = () => {
     megusuri: false,
     esa: null,
   }
-  const dateFormat: string = `${date.getFullYear()}${date.getMonth() + 1}${date.getDate()}`
-  const currentKameData = kame[dateFormat] || null
+
+  const getDateFormat = (date: Date): string => {
+    return `${date.getFullYear()}${date.getMonth() + 1}${date.getDate()}`
+  }
+
+  const getCurrentKameData = (date: Date): kame | null => {
+    const dateFormat = getDateFormat(date)
+    return kame[dateFormat] || kameTemplate
+  }
 
   const onChange = (date: Date) => {
     const formatDate = new Date (date)
     setDate(formatDate)
-    if (currentKameData) {
-      setCurrentKame(currentKameData)
-    } else {
-      setCurrentKame(kameTemplate)
-    }
+    console.log(formatDate)
+    const currentKameData = getCurrentKameData(formatDate)
+    console.log(currentKameData)
+    setCurrentKame(currentKameData)
   }
 
   const handleChangeKameTaiju = (event) => {
-    console.log(event.target.value)
-    let tmpkame = kame
-    console.log(currentKameData)
-    if (currentKameData) {
-      tmpkame[dateFormat].taiju = event.target.value
-    } else {
-      let tmpkameTemplate = kameTemplate
-      tmpkameTemplate.taiju = event.target.value
-      tmpkame[dateFormat] = kameTemplate
-    }
-    console.log(kame)
-    setKame(tmpkame)
+    let tmpCurrentKame = {...currentKame}
+    tmpCurrentKame.taiju = event.target.value
+    setCurrentKame(tmpCurrentKame)
+    let tmpKame = kame
+    const dateFormat = getDateFormat(date)
+    console.log("dateFormat")
+    console.log(dateFormat)
+    tmpKame[dateFormat] = tmpCurrentKame 
+    setKame(tmpKame)
     console.log(kame)
   }
 
@@ -86,7 +89,7 @@ const App: FC = () => {
                 <div className="form-row">
                   <label>
                     <span className="input-label">体重</span>
-                      <input className="input-number" type="number" value={currentKame.taiju } onChange={handleChangeKameTaiju}></input>
+                      <input className="input-number" type="number" value={currentKame && currentKame.taiju} onChange={handleChangeKameTaiju}></input>
                     <span className="input-unit">g</span>
                   </label>
                 </div>
