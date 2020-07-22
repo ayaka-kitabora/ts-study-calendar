@@ -3,40 +3,33 @@ import React, { useState, FC } from 'react'
 import Calendar from 'react-calendar'
 
 interface kame {
-  taiju: number | null,
-  nomigusuri: boolean,
+  taiju: string,
   megusuri: boolean,
-  esa: number | null,
+  esa: string,
 }
 
 const App: FC = () => {
+  let localKame = localStorage.getItem('kame') || {}
   const [date, setDate] = useState(new Date())
-  const [kame, setKame] = useState({
-    '20200618': {
-      taiju: 310,
-      nomigusuri: true,
-      megusuri: true,
-      esa: 100,
-    }
-  })
+  const [kame, setKame] = useState(localKame)
   const [currentKame, setCurrentKame] = useState({ 
-    taiju: null,
-    nomigusuri: false,
+    taiju: '',
     megusuri: false,
-    esa: null,
+    esa: '',
   })
 
   const kameTemplate = {
-    taiju: null,
-    nomigusuri: false,
+    taiju: '',
     megusuri: false,
-    esa: null,
+    esa: '',
   }
 
+  // 日付をkey用に整形
   const getDateFormat = (date: Date): string => {
     return `${date.getFullYear()}${date.getMonth() + 1}${date.getDate()}`
   }
 
+  // 選択した日付のカメデータを取得する
   const getCurrentKameData = (date: Date): kame | null => {
     const dateFormat = getDateFormat(date)
     return kame[dateFormat] || kameTemplate
@@ -45,9 +38,7 @@ const App: FC = () => {
   const onChange = (date: Date) => {
     const formatDate = new Date (date)
     setDate(formatDate)
-    console.log(formatDate)
     const currentKameData = getCurrentKameData(formatDate)
-    console.log(currentKameData)
     setCurrentKame(currentKameData)
   }
 
@@ -55,13 +46,31 @@ const App: FC = () => {
     let tmpCurrentKame = {...currentKame}
     tmpCurrentKame.taiju = event.target.value
     setCurrentKame(tmpCurrentKame)
-    let tmpKame = kame
     const dateFormat = getDateFormat(date)
-    console.log("dateFormat")
-    console.log(dateFormat)
+    let tmpKame = kame
     tmpKame[dateFormat] = tmpCurrentKame 
     setKame(tmpKame)
-    console.log(kame)
+  }
+
+  const handleChangeKameMegusuri = (event) => {
+    let tmpCurrentKame = {...currentKame}
+    tmpCurrentKame.megusuri = event.target.checked
+    setCurrentKame(tmpCurrentKame)
+    console.log(tmpCurrentKame)
+    const dateFormat = getDateFormat(date)
+    let tmpKame = kame
+    tmpKame[dateFormat] = tmpCurrentKame 
+    setKame(tmpKame)
+  }
+
+  const handleChangeKameEsa = (event) => {
+    let tmpCurrentKame = {...currentKame}
+    tmpCurrentKame.esa = event.target.value
+    setCurrentKame(tmpCurrentKame)
+    const dateFormat = getDateFormat(date)
+    let tmpKame = kame
+    tmpKame[dateFormat] = tmpCurrentKame 
+    setKame(tmpKame)
   }
 
 
@@ -96,19 +105,13 @@ const App: FC = () => {
                 <div className="form-row">
                   <label>
                     <span className="input-label">えさ</span>
-                      <input className="input-number" type="number"></input>
+                      <input className="input-number" type="number" value={currentKame && currentKame.esa} onChange={handleChangeKameEsa}></input>
                     <span className="input-unit">g</span>
                   </label>
                 </div>
                 <div className="form-row">
                   <label>
-                    <input type="checkbox"></input>
-                    <span className="input-label">飲み薬</span>
-                  </label>
-                </div>
-                <div className="form-row">
-                  <label>
-                    <input type="checkbox"></input>
+                    <input className="input-number" type="checkbox" checked={currentKame && currentKame.megusuri} onChange={handleChangeKameMegusuri}></input>
                     <span className="input-label">目薬</span>
                   </label>
                 </div>
