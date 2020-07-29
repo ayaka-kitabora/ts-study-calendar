@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import React, { useState, FC } from 'react'
+import React, { useState, FC, useEffect} from 'react'
 import Calendar from 'react-calendar'
 
 interface kame {
@@ -9,20 +9,28 @@ interface kame {
 }
 
 const App: FC = () => {
-  let localKame = localStorage.getItem('kame') || {}
-  const [date, setDate] = useState(new Date())
-  const [kame, setKame] = useState(localKame)
-  const [currentKame, setCurrentKame] = useState({ 
-    taiju: '',
-    megusuri: false,
-    esa: '',
-  })
-
   const kameTemplate = {
     taiju: '',
     megusuri: false,
     esa: '',
   }
+  const [date, setDate] = useState(new Date())
+  const [kame, setKame] = useState({})
+  const [currentKame, setCurrentKame] = useState(kameTemplate)
+  const localKameGetFlag = false
+
+  if (!localKameGetFlag) {
+    useEffect(() => {
+      // localStorageからkameをセットする
+      let localKame = localStorage.getItem('kame') || {}
+      console.log(localKame)
+      setKame(localKame)
+    })
+  }
+
+  useEffect(() => {
+    localStorage.setItem('kame',  JSON.stringify(kame))
+  }, [kame])
 
   // 日付をkey用に整形
   const getDateFormat = (date: Date): string => {
