@@ -17,24 +17,26 @@ const App: FC = () => {
   const [date, setDate] = useState(new Date())
   const [kame, setKame] = useState({})
   const [currentKame, setCurrentKame] = useState(kameTemplate)
-  const localKameGetFlag = false
+  const [localKameGetFlag, setLocalKameGetFlag] = useState(false)
 
-  if (!localKameGetFlag) {
     useEffect(() => {
-      // localStorageからkameをセットする
-      let localKame = localStorage.getItem('kame') || {}
-      console.log(localKame)
-      setKame(localKame)
+      if (!localKameGetFlag) {
+        // localStorageからkameをセットする
+        let localKame = JSON.parse(localStorage.getItem('kame'))
+        setLocalKameGetFlag(true)
+        setKame(localKame)
+        const dateFormat = getDateFormat(date)
+        const currentKameData = localKame[dateFormat] || kameTemplate
+        setCurrentKame(currentKameData)
+      }
     })
-  }
-
-  useEffect(() => {
-    localStorage.setItem('kame',  JSON.stringify(kame))
-  }, [kame])
 
   // 日付をkey用に整形
   const getDateFormat = (date: Date): string => {
-    return `${date.getFullYear()}${date.getMonth() + 1}${date.getDate()}`
+    const YY = date.getFullYear()
+    const MM = date.getMonth() + 1 >= 10 ? String(date.getMonth() + 1) : `0${date.getMonth() + 1}`
+    const DD = date.getDate() >= 10 ? String(date.getDate()) : `0${date.getDate()}`
+    return `${YY}${MM}${DD}`
   }
 
   // 選択した日付のカメデータを取得する
@@ -58,6 +60,7 @@ const App: FC = () => {
     let tmpKame = kame
     tmpKame[dateFormat] = tmpCurrentKame 
     setKame(tmpKame)
+    localStorage.setItem('kame',  JSON.stringify(kame))
   }
 
   const handleChangeKameMegusuri = (event) => {
@@ -69,6 +72,7 @@ const App: FC = () => {
     let tmpKame = kame
     tmpKame[dateFormat] = tmpCurrentKame 
     setKame(tmpKame)
+    localStorage.setItem('kame',  JSON.stringify(kame))
   }
 
   const handleChangeKameEsa = (event) => {
@@ -79,6 +83,7 @@ const App: FC = () => {
     let tmpKame = kame
     tmpKame[dateFormat] = tmpCurrentKame 
     setKame(tmpKame)
+    localStorage.setItem('kame',  JSON.stringify(kame))
   }
 
 
